@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar // Импортируем ProgressBar для индикатора загрузки
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
@@ -59,7 +60,7 @@ class PhotoGalleryFragment : Fragment() {
 
         // Инициализация RecyclerView и установка менеджера компоновки в виде сетки с 3 столбцами
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
-        photoRecyclerView.layoutManager = GridLayoutManager(context, 3)
+        photoRecyclerView.layoutManager = GridLayoutManager(context, 3) //tut
 
         // Инициализация индикатора загрузки из макета фрагмента
         loadingIndicator = view.findViewById(R.id.loading_indicator)
@@ -168,22 +169,27 @@ class PhotoGalleryFragment : Fragment() {
         }
     }
 
-    private class PhotoHolder(private val itemImageView: ImageView) : RecyclerView.ViewHolder(itemImageView) {
+    private class PhotoHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val itemImageView: ImageView = itemView.findViewById(R.id.item_image_view)
+        private val photoTitleView: TextView = itemView.findViewById(R.id.photo_title)
+
         fun bindGalleryItem(galleryItem: GalleryItem) {
-            Picasso.get()  // Используем библиотеку Picasso для загрузки изображения
-                .load(galleryItem.url)  // Загружаем изображение по URL из объекта GalleryItem
-                .placeholder(R.drawable.bill_up_close)  // Устанавливаем изображение-заполнитель во время загрузки
-                .into(itemImageView)  // Загружаем изображение в ImageView
+            Picasso.get()
+                .load(galleryItem.url)
+                .placeholder(R.drawable.ic_launcher_background)
+                .into(itemImageView)
+
+            photoTitleView.text = galleryItem.title
         }
     }
 
-    // Здесь происходит наполнение карточки изображения (list_item_gallery)
+
     private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>) : RecyclerView.Adapter<PhotoHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.list_item_gallery, parent, false) as ImageView  // Инфляция макета элемента списка и преобразование в ImageView
-            return PhotoHolder(view)  // Возвращаем новый экземпляр PhotoHolder с инфлированным представлением
+                .inflate(R.layout.list_item_gallery, parent, false) // Загружаем FrameLayout
+            return PhotoHolder(view) // Передаем View в PhotoHolder
         }
 
         override fun getItemCount(): Int = galleryItems.size  // Возвращаем количество элементов в списке
